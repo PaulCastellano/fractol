@@ -2,26 +2,29 @@ NAME = fractol
 
 FILES = main.c
 
-OBJECTS = $(FILES:.c=.o)
+OBJ = $(FILES:.c=.o)
 
 CFLAG = -Wall -Werror -Wextra
 
-ATTACH = -L libft/ -lft -lmlx -framework OpenGL -framework AppKit
+LIBXL = -lm -L libft/ -L/usr/lib/X11 -lmlx -lXext -lX11
 
 all: $(NAME)
 
-$(NAME):
-	make -C libft/ fclean
-	make -C libft/
-	gcc $(CFLAG) -I libft/ -c $(FILES)
-	gcc $(CFLAG) -o $(NAME) $(OBJECTS)  $(ATTACH)
+$(NAME) : libft
+	echo "Creating LINUX executable $(NAME) ..."
+	gcc $(CFLAGS) libft/libft.h -c $(FILES)
+	gcc -o $(NAME) $(OBJ) libft/libft.a $(LIBXL)
 
-clean:
-	/bin/rm -f $(OBJECTS)
-	make -C libft/ clean
+libft:
+	make -C libft fclean
+	make -C libft
 
-fclean: clean
-	/bin/rm -f $(NAME)
-	make -C libft/ fclean
+clean :
+	echo "Removing object files ..."
+	rm -f $(OBJ)
+
+fclean : clean
+	echo "Removing $(NAME) ..."
+	rm -f $(NAME)
 
 re: fclean all
