@@ -1,31 +1,62 @@
+# **************************************************************************** #
+#                                                                              #
+#                                                         :::      ::::::::    #
+#    Makefile                                           :+:      :+:    :+:    #
+#                                                     +:+ +:+         +:+      #
+#    By: egaraz <marvin@42.fr>                      +#+  +:+       +#+         #
+#                                                 +#+#+#+#+#+   +#+            #
+#    Created: 2018/04/03 18:02:27 by egaraz            #+#    #+#              #
+#    Updated: 2018/04/03 18:02:29 by egaraz           ###   ########.fr        #
+#                                                                              #
+# **************************************************************************** #
 
-NAME = fractol
+NAME	= fractol
 
-FILES = main.c
+SRC		= src/main.c \
+		  src/init.c \
+		  src/key.c \
+		  src/expose.c \
+		  src/mouse.c \
+		  src/text.c \
+		  src/loop.c \
+		  src/move.c \
+		  src/error.c \
+		  src/color.c \
+		  src/utils.c \
+		  src/mandelbrot.c \
+		  src/julia.c \
+		  src/burningship.c
 
-OBJECTS = $(FILES:.c=.o)
-
-CFLAG = -Wall -Werror -Wextra
-
-ATTACH = -L libft/ -lft -lmlx -framework OpenGL -framework AppKit
+OBJ		= $(patsubst src/%.c,obj/%.o,$(SRC))
+.SILENT:
 
 all: $(NAME)
 
-$(NAME):
-	make -C libft/ fclean
+$(NAME): $(OBJ)
 	make -C libft/
-	gcc $(CFLAG) -I libft/ -c $(FILES)
-	gcc $(CFLAG) -o $(NAME) $(OBJECTS) $(ATTACH)
+	gcc -Wall -Wextra -Werror -L libft/ -lft -L/usr/local/lib -lmlx -framework OpenGL -framework AppKit $(SRC) -o $(NAME)
+	printf '\033[32m[ ✔ ] %s\n\033[0m' "Create Fractol"
+
+obj/%.o: src/%.c
+	mkdir -p obj
+	gcc -Wall -Wextra -Werror -c $< -o $@
+	printf '\033[0m[ ✔ ] %s\n\033[0m' "$<"
 
 clean:
-	/bin/rm -f $(OBJECTS)
+	/bin/rm -rf obj/
 	make -C libft/ clean
+	printf '\033[31m[ ✔ ] %s\n\033[0m' "Clean Libprintf"
 
 fclean: clean
 	/bin/rm -f $(NAME)
 	make -C libft/ fclean
+	printf '\033[31m[ ✔ ] %s\n\033[0m' "Fclean Libprintf"
 
 re: fclean all
 
-norme:
-	norminette $(FILES)
+test: re
+	printf '\033[32m%s\n\033[0m' "-------------------------------------"
+	./fdf
+
+all: $(NAME)
+.PHONY: clean fclean re all
